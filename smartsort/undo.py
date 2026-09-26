@@ -96,7 +96,7 @@ def undo_last(folder_path: str) -> dict:
             "errors": ["No history found. Nothing to undo."],
         }
 
-    # Pop the last operation
+    # The last entry in the list is the most recent operation
     last_entry = history.pop()
 
     summary = {
@@ -108,6 +108,7 @@ def undo_last(folder_path: str) -> dict:
     }
 
     for move in last_entry["moves"]:
+        # Flip direction: "to" is where it lives now, "from" is where it should go back
         src = Path(move["to"])   # Current location (where it was moved TO)
         dst = Path(move["from"])  # Original location (where it came FROM)
 
@@ -128,7 +129,7 @@ def undo_last(folder_path: str) -> dict:
             summary["errors"].append(f"Failed to restore {src.name}: {e}")
             summary["failed"] += 1
 
-    # Clean up empty category folders
+    # Remove any category folders that are now empty after restoring files
     _cleanup_empty_dirs(folder)
 
     # Save updated history (without the undone entry)
