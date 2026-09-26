@@ -50,13 +50,13 @@ class SmartSortHandler(FileSystemEventHandler):
         if file_path in self._recently_processed:
             return
 
-        # Skip files in subdirectories (only organize top-level files)
+        # Only handle files dropped directly in the watched folder, not in subfolders
         file = Path(file_path)
         watched = Path(self.target_folder).resolve()
         if file.parent.resolve() != watched:
             return
 
-        # Wait a moment for the file to finish writing
+        # Give the OS a moment to finish writing the file before we try to move it
         time.sleep(0.5)
 
         # Check file still exists (it might have been a temp file)
@@ -88,7 +88,7 @@ class SmartSortHandler(FileSystemEventHandler):
         except Exception as e:
             print(f"  [X] Error processing {file.name}: {e}")
 
-        # Clean up tracking set (keep it from growing forever)
+        # Prevent the tracking set from growing without bound in long sessions
         if len(self._recently_processed) > 1000:
             self._recently_processed.clear()
 
