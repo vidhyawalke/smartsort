@@ -71,9 +71,10 @@ def load_config(config_path: str | None = None) -> dict:
         A dictionary with 'categories', 'default_category', and 'ignore_patterns'.
     """
     if config_path:
+        # User passed an explicit path, use it directly
         path = Path(config_path)
     else:
-        # Look for config.json next to the package
+        # Look for config.json one level above the package directory
         path = Path(__file__).parent.parent / "config.json"
 
     if path.exists():
@@ -81,16 +82,19 @@ def load_config(config_path: str | None = None) -> dict:
             with open(path, "r", encoding="utf-8") as f:
                 user_config = json.load(f)
 
-            # Merge with defaults — user config takes priority
+            # Start with built-in defaults, then overwrite with user values
+            # so any key not in the user config still gets a sensible default
             merged = DEFAULT_RULES.copy()
             merged.update(user_config)
             return merged
 
         except (json.JSONDecodeError, IOError) as e:
+            # Config file exists but couldn't be parsed — warn and fall back
             print(f"[!] Warning: Could not load config from {path}: {e}")
             print("   Falling back to default rules.")
             return DEFAULT_RULES.copy()
 
+    # No config file found anywhere, use built-in defaults
     return DEFAULT_RULES.copy()
 
 
@@ -107,5 +111,6 @@ def build_extension_map(config: dict) -> dict[str, str]:
     ext_map = {}
     for category, extensions in config["categories"].items():
         for ext in extensions:
+            # Normalise to lowercase so lookups are case-insensitive
             ext_map[ext.lower()] = category
     return ext_map
