@@ -1,7 +1,5 @@
 # SmartSort — Automated File Organizer
 
-[![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)]()
 
 Run with `python -m smartsort /path/to/folder` from your terminal.
 
