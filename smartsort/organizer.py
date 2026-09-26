@@ -50,6 +50,7 @@ def generate_unique_path(dest: Path) -> Path:
     parent = dest.parent
     counter = 1
 
+    # Keep incrementing until we find a name that isn't taken
     while True:
         new_name = f"{stem} ({counter}){suffix}"
         new_path = parent / new_name
@@ -143,7 +144,7 @@ def organize_folder(
         dest_path = generate_unique_path(category_dir / filename)
 
         if dry_run:
-            # Just record what would happen
+            # Record the planned move without touching the file system
             summary["moves"].append((str(file_path), str(dest_path)))
             summary["categories"][category] = (
                 summary["categories"].get(category, 0) + 1
@@ -154,7 +155,7 @@ def organize_folder(
                 # Create category directory if it doesn't exist
                 category_dir.mkdir(exist_ok=True)
 
-                # Move the file
+                # Move the file to its new home
                 shutil.move(str(file_path), str(dest_path))
 
                 summary["moves"].append((str(file_path), str(dest_path)))
@@ -164,6 +165,7 @@ def organize_folder(
                 summary["moved"] += 1
 
             except (OSError, shutil.Error) as e:
+                # File couldn't be moved — record the error and keep going
                 error_msg = f"Failed to move {filename}: {e}"
                 summary["errors"].append(error_msg)
                 summary["skipped"] += 1
