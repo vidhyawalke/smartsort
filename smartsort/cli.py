@@ -77,7 +77,7 @@ def print_summary(summary: dict) -> None:
         table.add_column("Category", style="cyan", min_width=15)
         table.add_column("Files", style="green", justify="right")
 
-        # Sort by count (descending)
+        # Sort categories by file count so the busiest ones appear first
         sorted_cats = sorted(
             summary["categories"].items(), key=lambda x: x[1], reverse=True
         )
@@ -209,17 +209,17 @@ def main() -> None:
 
     try:
         if args.undo:
-            # Undo mode
+            # Reverse the most recent sort operation
             console.print("[bold cyan][<] Undoing last operation...[/]\n")
             summary = undo_last(folder)
             print_undo_summary(summary)
 
         elif args.watch:
-            # Watch mode
+            # Hand off to the real-time folder watcher (blocks until Ctrl+C)
             watch_folder(folder, args.config)
 
         else:
-            # Organize mode (one-shot)
+            # One-shot organize mode
             if args.dry_run:
                 console.print("[bold yellow][~] Running in dry-run mode...[/]\n")
             else:
